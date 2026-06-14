@@ -1,7 +1,7 @@
 # SAGE - Semantic Agentic Git Engine
 
 <p align="center">
-  <img src="assets/sage-developer-tool.svg" alt="SAGE Developer Tool logo" width="100%">
+  <img src="assets/SAGE_LOGO.png" alt="SAGE Developer Tool logo" width="100%">
 </p>
 
 SAGE gives a GitHub repository memory. It is a GitHub App that watches issues,
