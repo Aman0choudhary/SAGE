@@ -13,6 +13,18 @@ from sage.github.webhooks import validate_github_signature
 app = FastAPI(title="SAGE", version="0.1.0")
 
 
+@app.get("/")
+async def root() -> dict[str, str]:
+    settings = get_settings()
+    return {
+        "service": "SAGE",
+        "status": "ok",
+        "model": settings.model,
+        "health": "/health",
+        "webhook": "/webhook",
+    }
+
+
 @app.get("/health")
 async def health() -> dict[str, str]:
     settings = get_settings()
