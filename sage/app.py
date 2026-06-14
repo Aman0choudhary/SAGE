@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import Annotated
 
 from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Request
@@ -11,6 +12,7 @@ from sage.dispatcher import dispatch_agent
 from sage.github.webhooks import validate_github_signature
 
 app = FastAPI(title="SAGE", version="0.1.0")
+logger = logging.getLogger("sage")
 
 
 @app.get("/")
@@ -55,7 +57,12 @@ async def webhook(
 
     agent_name = router.route(x_github_event, payload)
     if agent_name != "ignore":
-        background_tasks.add_task(dispatch_agent, agent_name, payload)
+        settings = get_settings()
+        if settings.is_production:
+            logger.info("Dispatching agent synchronously", extra={"agent": agent_name})
+            await dispatch_agent(agent_name, payload)
+        else:
+            background_tasks.add_task(dispatch_agent, agent_name, payload)
 
     return {"status": "ok", "agent": agent_name}
 
