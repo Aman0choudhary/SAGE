@@ -12,6 +12,18 @@ When a risky issue or PR appears, SAGE can warn the team, ask hard questions,
 track promises, review code against past decisions, and store new decisions for
 future enforcement.
 
+## Live Demo
+
+- Cloud Run demo: https://s-age0-380815040698.europe-west1.run.app
+- Demo video: https://youtu.be/atiNLq121zg
+- Live proof issue: https://github.com/Aman0choudhary/SAGE/issues/9
+
+<p align="center">
+  <a href="https://youtu.be/atiNLq121zg">
+    <img src="https://img.youtube.com/vi/atiNLq121zg/maxresdefault.jpg" alt="Watch the SAGE demo video" width="100%">
+  </a>
+</p>
+
 ## Demo Status
 
 Working live loop:
