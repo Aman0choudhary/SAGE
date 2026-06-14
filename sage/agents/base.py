@@ -57,7 +57,12 @@ class ResponsesAgentRunner:
         tools: list[dict[str, Any]],
         context: ToolContext,
     ) -> AgentResult:
-        input_items: list[Any] = [{"role": "user", "content": input_text}]
+        input_items: list[Any] = [
+            {
+                "role": "user",
+                "content": _with_tool_context(input_text, context),
+            }
+        ]
         response: Any | None = None
 
         for _ in range(self.max_tool_rounds):
@@ -122,6 +127,21 @@ def _parse_arguments(raw: str | dict[str, Any] | None) -> dict[str, Any]:
     except json.JSONDecodeError:
         return {}
     return parsed if isinstance(parsed, dict) else {}
+
+
+def _with_tool_context(input_text: str, context: ToolContext) -> str:
+    number = context.number if context.number is not None else "not applicable"
+    return f"""
+Tool context for function calls:
+- repo: {context.repo}
+- issue_or_pr_number: {number}
+
+When calling tools that require `repo`, use exactly: {context.repo}
+When calling tools that require `number`, use exactly: {number}
+
+Event input:
+{input_text}
+""".strip()
 
 
 def get_agent_runner() -> ResponsesAgentRunner | DryRunAgentRunner:

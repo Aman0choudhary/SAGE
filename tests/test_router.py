@@ -24,6 +24,16 @@ def test_routes_sage_ask_before_followup():
     assert route("issue_comment", payload) == "sage_ask"
 
 
+def test_ignores_bot_issue_comments_to_prevent_self_reply_loop():
+    payload = {
+        "comment": {
+            "body": "SAGE generated pre-mortem",
+            "user": {"login": "s-age0[bot]", "type": "Bot"},
+        },
+        "issue": {"number": 1},
+    }
+    assert route("issue_comment", payload) == "ignore"
+
+
 def test_unknown_event_is_ignored():
     assert route("watch", {"action": "started"}) == "ignore"
-

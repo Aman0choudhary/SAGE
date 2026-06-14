@@ -12,6 +12,10 @@ def route(event_type: str | None, payload: dict) -> str:
         return "premortem"
 
     if event_type == "issue_comment":
+        comment_user = ((payload.get("comment") or {}).get("user") or {})
+        if comment_user.get("type") == "Bot":
+            return "ignore"
+
         body = (payload.get("comment") or {}).get("body", "").lower()
         issue = payload.get("issue") or {}
 
@@ -36,4 +40,3 @@ def route(event_type: str | None, payload: dict) -> str:
         return "commit_keeper"
 
     return "ignore"
-
