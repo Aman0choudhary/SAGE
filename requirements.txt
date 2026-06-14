@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+openai>=1.80.0
+PyGithub
+supabase
+python-dotenv
+click
+pydantic
+httpx
+PyJWT
+pytest
+pytest-asyncio
+

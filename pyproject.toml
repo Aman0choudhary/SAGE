@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sage-git-engine"
+version = "0.1.0"
+description = "Semantic Agentic Git Engine for GitHub decision memory"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "openai>=1.80.0",
+    "PyGithub",
+    "supabase",
+    "python-dotenv",
+    "click",
+    "pydantic",
+    "httpx",
+    "PyJWT",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+]
+
+[project.scripts]
+sage = "sage.cli.main:cli"
+
+[tool.setuptools.packages.find]
+include = ["sage*"]
+
