@@ -62,3 +62,13 @@ python -m pytest
 6. For CLI migration:
    - Set `GITHUB_TOKEN` with repo read access
    - Run `sage migrate --repo owner/repo --limit 50`
+
+## Deploy
+
+Deployment guides:
+
+- Google Cloud Run: [deploy/cloud-run.md](deploy/cloud-run.md)
+- Render: [deploy/render.md](deploy/render.md)
+
+For cloud deployment, do not upload `sage-app.pem`. Use the secret/environment
+variable `GITHUB_APP_PRIVATE_KEY` with the PEM contents instead.
