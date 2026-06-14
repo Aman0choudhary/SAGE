@@ -43,7 +43,8 @@ class Settings:
 
 
 def get_settings() -> Settings:
-    load_dotenv()
+    if os.getenv("SAGE_TESTING") != "1":
+        load_dotenv()
     return Settings(
         openai_api_key=os.getenv("OPENAI_API_KEY"),
         model=os.getenv("MODEL", "gpt-5.5"),
