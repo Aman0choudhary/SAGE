@@ -1,74 +1,208 @@
-# SAGE
+# SAGE - Semantic Agentic Git Engine
 
-SAGE is a GitHub App that gives repositories durable decision memory. It receives
-GitHub webhooks, routes them to agent workflows, lets OpenAI Responses API agents
-use tools, and stores semantic memories in OpenAI Vector Stores with structured
-metadata in Supabase.
+SAGE gives a GitHub repository memory. It is a GitHub App that watches issues,
+pull requests, comments, merges, and pushes, then uses OpenAI's Responses API to
+act like a senior engineer who remembers prior decisions.
 
-## Quick start
+When a risky issue or PR appears, SAGE can warn the team, ask hard questions,
+track promises, review code against past decisions, and store new decisions for
+future enforcement.
 
-```bash
+## Demo Status
+
+Working live loop:
+
+```text
+GitHub issue -> webhook -> FastAPI -> OpenAI Responses API -> GitHub bot comment + label
+```
+
+Verified locally:
+
+- `23` tests passing
+- GitHub webhook HMAC validation
+- GitHub App bot comments and labels
+- OpenAI API access with configured model
+- Supabase metadata connectivity
+- Cloudflare Tunnel local demo
+- Cloud Run deployment files included
+
+## Core Features
+
+- Pre-mortem agent for newly opened issues
+- Follow-up agent for developer replies
+- PR review agent with five review layers
+- Decision extractor for merged PRs
+- Reply handler for `sage: intentional`, `sage: accidental`, and `sage: discuss`
+- `@sage ask` memory Q&A agent
+- Onboarding and health-audit agent scaffolds
+- OpenAI Vector Store memory helper
+- Supabase schema for structured metadata
+- CLI commands for stats, validation, dashboard, and migration
+
+## Architecture
+
+```text
+GitHub Webhooks
+  -> FastAPI /webhook
+  -> Router
+  -> Agent
+  -> OpenAI Responses API
+  -> Function tools
+  -> GitHub API + Supabase + OpenAI Vector Stores
+```
+
+Important folders:
+
+```text
+sage/app.py              FastAPI app
+sage/router.py           GitHub event routing
+sage/agents/             SAGE agents
+sage/tools/              OpenAI function tool definitions and handlers
+sage/github/             GitHub auth, comments, fetchers, webhooks
+sage/memory/             Memory models, store, vector-store helper
+sage/cli/                CLI commands
+schema.sql               Supabase schema
+deploy/                  Cloud Run and Render deployment guides
+```
+
+## Quick Start
+
+```powershell
 python -m venv .venv
-.venv\Scripts\activate
+.\.venv\Scripts\activate
 pip install -e .[dev]
-copy .env.example .env
-uvicorn sage.app:app --reload
+Copy-Item .env.example .env
+```
+
+Fill `.env` with your real values. Do not commit `.env`.
+
+Run the app:
+
+```powershell
+python -m uvicorn sage.app:app --reload
+```
+
+Health check:
+
+```powershell
+Invoke-WebRequest http://127.0.0.1:8000/health
 ```
 
 Run tests:
 
-```bash
+```powershell
 python -m pytest
 ```
 
-## Current build slice
+## Environment Variables
 
-- FastAPI webhook endpoint with HMAC validation
-- GitHub event router
-- GitHub App installation-token auth with `GITHUB_TOKEN` fallback
-- Live GitHub PR diff/comment fetching for PR review and decision extraction
-- OpenAI Responses API agent loop with function-call outputs
-- Tool definitions and handler dispatch
-- In-memory development store plus Supabase/OpenAI integration points
-- Phase 1 agents and command agents scaffolded
-- CLI skeleton for `sage stats`, `sage validate`, `sage dashboard`, and `sage migrate`
+Required:
 
-## What you need to do
+```text
+OPENAI_API_KEY
+MODEL
+GITHUB_APP_ID
+GITHUB_WEBHOOK_SECRET
+GITHUB_TOKEN
+SUPABASE_URL
+SUPABASE_SERVICE_KEY
+PORT
+ENVIRONMENT
+MAX_DIFF_CHARS
+```
 
-1. Create a GitHub App:
-   - Webhook URL: `https://YOUR_PUBLIC_URL/webhook`
-   - Webhook secret: copy into `GITHUB_WEBHOOK_SECRET`
-   - Repository permissions: Issues read/write, Pull requests read/write, Contents read, Metadata read
-   - Events: Issues, Issue comments, Pull requests, Pull request review comments, Push
-   - Download the private key and set either `GITHUB_APP_PRIVATE_KEY_PATH` or `GITHUB_APP_PRIVATE_KEY`
+For local GitHub App auth, use:
 
-2. Create a Supabase project:
-   - Run `schema.sql` in the SQL editor
-   - Set `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`
+```text
+GITHUB_APP_PRIVATE_KEY_PATH=./sage-app.pem
+```
 
-3. Add OpenAI credentials:
-   - Set `OPENAI_API_KEY`
-   - Keep `MODEL=gpt-5.5` for the hackathon demo, or set your cheaper dev model while testing
+For cloud deployment, use:
 
-4. Expose the local app while developing:
-   - Start the server with `uvicorn sage.app:app --reload`
-   - Use a tunnel such as ngrok or Cloudflare Tunnel and paste its `/webhook` URL into the GitHub App
+```text
+GITHUB_APP_PRIVATE_KEY=<full PEM contents>
+```
 
-5. Install the GitHub App on your test repo, then try:
-   - Open an issue to trigger the pre-mortem agent
-   - Open a PR to trigger PR review
-   - Merge a PR to trigger decision extraction
+Do not upload `sage-app.pem` to a cloud image or commit it to git.
 
-6. For CLI migration:
-   - Set `GITHUB_TOKEN` with repo read access
-   - Run `sage migrate --repo owner/repo --limit 50`
+## GitHub App Setup
 
-## Deploy
+Create a GitHub App with:
+
+- Issues: read/write
+- Pull requests: read/write
+- Contents: read
+- Metadata: read
+
+Subscribe to:
+
+- Issues
+- Issue comments
+- Pull requests
+- Pull request review comments
+- Push
+
+Webhook URL:
+
+```text
+https://YOUR_PUBLIC_URL/webhook
+```
+
+The GitHub webhook secret must match `GITHUB_WEBHOOK_SECRET`.
+
+## Try The Demo
+
+Open a GitHub issue like:
+
+```text
+Title: Add Redis caching to auth token validation
+
+Body: We want to cache auth token validation results for performance.
+The implementation may cache revocation checks and token metadata.
+```
+
+Expected:
+
+- SAGE bot comments with a pre-mortem
+- SAGE applies a risk label such as `sage-risk: high`
+
+Ask SAGE:
+
+```text
+@sage ask what should we know before caching auth tokens?
+```
+
+## Deployment
 
 Deployment guides:
 
 - Google Cloud Run: [deploy/cloud-run.md](deploy/cloud-run.md)
 - Render: [deploy/render.md](deploy/render.md)
 
-For cloud deployment, do not upload `sage-app.pem`. Use the secret/environment
-variable `GITHUB_APP_PRIVATE_KEY` with the PEM contents instead.
+Cloud Run helper:
+
+```powershell
+.\deploy\deploy-cloud-run.ps1 -ProjectId YOUR_GCP_PROJECT_ID
+```
+
+After deployment, update the GitHub App webhook URL to:
+
+```text
+https://YOUR_DEPLOYED_URL/webhook
+```
+
+## Current Scope
+
+This is a hackathon MVP. The live issue pre-mortem loop works. The PR review,
+decision extraction, onboarding, health audit, and dashboard paths are scaffolded
+and ready for deeper hardening.
+
+Planned next steps:
+
+- Full PR review end-to-end test
+- Decision extraction after merge
+- Rich dashboard
+- Rate limiting and retries
+- More integration tests
+- ADR export and cross-repo memory
+
