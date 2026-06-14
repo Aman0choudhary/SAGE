@@ -40,6 +40,15 @@ gcloud secrets create SUPABASE_SERVICE_KEY --data-file=-
 For commands using `--data-file=-`, paste the secret value, then press `Ctrl+Z`
 and Enter in PowerShell.
 
+Alternatively, after `gcloud init`, use the helper script from this repo:
+
+```powershell
+.\deploy\deploy-cloud-run.ps1 -ProjectId YOUR_GCP_PROJECT_ID
+```
+
+It reads your local `.env`, uploads secrets to Secret Manager, deploys to Cloud
+Run, and prints the service URL.
+
 ## 4. Deploy from source
 
 ```powershell
@@ -74,4 +83,3 @@ Invoke-WebRequest https://YOUR_CLOUD_RUN_URL/health
 ```
 
 Then open a GitHub issue in the installed repo. SAGE should comment and label it.
-
