@@ -1,5 +1,9 @@
 # SAGE - Semantic Agentic Git Engine
 
+<p align="center">
+  <img src="assets/sage-developer-tool.svg" alt="SAGE Developer Tool logo" width="100%">
+</p>
+
 SAGE gives a GitHub repository memory. It is a GitHub App that watches issues,
 pull requests, comments, merges, and pushes, then uses OpenAI's Responses API to
 act like a senior engineer who remembers prior decisions.
@@ -205,4 +209,3 @@ Planned next steps:
 - Rate limiting and retries
 - More integration tests
 - ADR export and cross-repo memory
-
